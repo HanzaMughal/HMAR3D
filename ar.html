@@ -20,10 +20,35 @@
   <link rel="stylesheet" href="./css/style.css" />
   <link rel="stylesheet" href="./css/ar.css" />
 
-  <!-- ╔══════════════════════════════════════════════╗
-       ║  MindAR.js + Three.js — AR Libraries (CDN)  ║
-       ╚══════════════════════════════════════════════╝ -->
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"></script>
+  <!-- ╔══════════════════════════════════════════════════════╗
+       ║  AR Libraries — Three.js r128 + GLTFLoader + MindAR ║
+       ╚══════════════════════════════════════════════════════╝ -->
+
+  <!-- Step 1: Track load state -->
+  <script>
+    window.__AR_LIBS = { three: false, gltf: false, mindar: false, errors: [] };
+  </script>
+
+  <!-- Step 2: Three.js r128 (must match MindAR's bundled version) -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"
+    onload="window.__AR_LIBS.three = true;"
+    onerror="window.__AR_LIBS.errors.push('three');"
+  ></script>
+
+  <!-- Step 3: GLTFLoader (for loading .glb 3D models) -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"
+    onload="window.__AR_LIBS.gltf = true;"
+    onerror="window.__AR_LIBS.errors.push('gltf');"
+  ></script>
+
+  <!-- Step 4: MindAR image tracking (uses external THREE loaded above) -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+    onload="window.__AR_LIBS.mindar = true;"
+    onerror="window.__AR_LIBS.errors.push('mindar');"
+  ></script>
 </head>
 <body class="ar-page">
 
@@ -71,6 +96,7 @@
     </div>
 
     <a href="./index.html" class="error-back-btn">← Back to Home</a>
+    <button class="error-back-btn" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);cursor:pointer;" onclick="location.reload()">🔄 Retry</button>
   </div>
 
   <!-- ░░ AR Container (camera + canvas rendered here by MindAR) ░░ -->

@@ -76,6 +76,37 @@ async function checkTargetFile() {
   }
 }
 
+/* ── Wait for CDN libraries to finish loading ── */
+async function waitForLibs(timeoutMs = 30000) {
+  const start = Date.now();
+  updateLoadingText('Loading AR libraries…');
+
+  while (Date.now() - start < timeoutMs) {
+    const libs = window.__AR_LIBS || {};
+
+    // If any script failed to load from CDN, bail early
+    if (libs.errors && libs.errors.length > 0) {
+      return { ok: false, reason: `CDN failed to load: ${libs.errors.join(', ')}` };
+    }
+
+    // All three scripts loaded AND MINDAR is accessible
+    if (libs.three && libs.gltf && libs.mindar &&
+        window.MINDAR && window.MINDAR.IMAGE &&
+        window.THREE && window.THREE.GLTFLoader) {
+      return { ok: true };
+    }
+
+    // Update user with progress
+    const loaded = [libs.three && 'Three.js', libs.gltf && 'GLTFLoader', libs.mindar && 'MindAR']
+      .filter(Boolean).join(', ');
+    if (loaded) updateLoadingText(`Loaded: ${loaded}…`);
+
+    await new Promise(r => setTimeout(r, 300));
+  }
+
+  return { ok: false, reason: 'Timed out waiting for AR libraries (30s). Check your connection.' };
+}
+
 /* ── Main AR Init ── */
 async function initAR() {
   // 1. Check browser support
@@ -87,11 +118,12 @@ async function initAR() {
     return;
   }
 
-  // 2. Check MINDAR loaded
-  if (!window.MINDAR || !window.MINDAR.IMAGE || !window.THREE) {
+  // 2. Wait for CDN libraries (Three.js + GLTFLoader + MindAR)
+  const libResult = await waitForLibs();
+  if (!libResult.ok) {
     showError(
       '📦 Libraries Not Loaded',
-      'Required AR libraries failed to load. Please check your internet connection and reload.'
+      libResult.reason + ' — Tap Retry or check your internet connection.'
     );
     return;
   }
@@ -126,25 +158,26 @@ async function initAR() {
 
   const { renderer, scene, camera } = mindarThree;
 
-  // 5. Lighting setup
-  const ambientLight = new window.THREE.AmbientLight(0xffffff, 1.2);
+  // 5. Lighting setup (use global THREE — loaded via separate CDN script)
+  const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
   scene.add(ambientLight);
 
-  const directionalLight = new window.THREE.DirectionalLight(0xfff4e0, 1.8);
+  const directionalLight = new THREE.DirectionalLight(0xfff4e0, 1.8);
   directionalLight.position.set(1, 2, 2);
   scene.add(directionalLight);
 
-  const fillLight = new window.THREE.DirectionalLight(0xff9f1c, 0.6);
+  const fillLight = new THREE.DirectionalLight(0xff9f1c, 0.6);
   fillLight.position.set(-2, -1, -1);
   scene.add(fillLight);
 
-  const rimLight = new window.THREE.PointLight(0xffd700, 0.8, 5);
+  const rimLight = new THREE.PointLight(0xffd700, 0.8, 5);
   rimLight.position.set(0, 2, -1);
   scene.add(rimLight);
 
   // 6. Load 3D Model
   updateLoadingText('Loading 3D burger model…');
-  const loader = new window.THREE.GLTFLoader();
+  // GLTFLoader is loaded as a separate script and attaches itself to THREE
+  const loader = new THREE.GLTFLoader();
 
   let model      = null;
   let mixer      = null;
@@ -179,7 +212,7 @@ async function initAR() {
 
       // Play built-in animations if any
       if (gltf.animations && gltf.animations.length > 0) {
-        mixer = new window.THREE.AnimationMixer(model);
+        mixer = new THREE.AnimationMixer(model);
         gltf.animations.forEach((clip) => {
           const action = mixer.clipAction(clip);
           action.play();
@@ -255,7 +288,7 @@ async function initAR() {
   showInstructions();
 
   // 9. Animation loop
-  const clock = new window.THREE.Clock();
+  const clock = new THREE.Clock();
   renderer.setAnimationLoop(() => {
     const elapsed = clock.getElapsedTime();
     const delta   = clock.getDelta();
@@ -283,7 +316,8 @@ async function initAR() {
 }
 
 /* ── Bootstrap ── */
-window.addEventListener('DOMContentLoaded', () => {
+// Use 'load' event (not DOMContentLoaded) so all scripts are guaranteed done
+window.addEventListener('load', () => {
   // Small delay so loading screen is visible before heavy init
   setTimeout(initAR, 300);
 });
