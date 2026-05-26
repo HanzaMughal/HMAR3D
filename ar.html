@@ -91,6 +91,7 @@
 
     <a href="./index.html" class="error-back-btn">← Back to Home</a>
     <button class="error-back-btn" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);cursor:pointer;" onclick="location.reload()">🔄 Retry</button>
+    <button class="error-back-btn" style="background:rgba(255,100,100,0.2);border:1px solid rgba(255,100,100,0.5);cursor:pointer;margin-top:10px;" onclick="testRawCamera()">🛠️ Test Camera Hardware</button>
   </div>
 
   <!-- ░░ AR Container (camera + canvas rendered here by MindAR) ░░ -->
@@ -155,6 +156,22 @@
     document.body.addEventListener('touchmove', (e) => {
       if (e.touches.length === 1) e.preventDefault();
     }, { passive: false });
+
+    // Raw Camera Test for debugging OS blocks
+    async function testRawCamera() {
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          alert("Your browser literally does not support cameras (navigator.mediaDevices is missing).");
+          return;
+        }
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        alert("SUCCESS! Camera hardware works. The issue is specific to the AR engine's configuration.");
+        // Stop stream immediately
+        stream.getTracks().forEach(t => t.stop());
+      } catch (err) {
+        alert("RAW CAMERA FAILED: [" + err.name + "] " + err.message + "\n\nThis means your browser or phone is blocking ALL camera access for this site. Check your Chrome Site Settings or App Permissions.");
+      }
+    }
   </script>
 
   <!-- ░░ AR Controller (Loaded as ES Module) ░░ -->
