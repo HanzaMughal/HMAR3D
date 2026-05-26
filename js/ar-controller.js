@@ -237,7 +237,9 @@ async function initAR() {
         'Please allow camera access when prompted, then reload the page. On iOS: Settings → Safari → Camera → Allow.'
       );
     } else {
-      showError('📷 Camera Error', (err && err.message) ? err.message : 'Could not access the camera. Make sure you are using a secure connection (HTTPS) and have a working camera.');
+      const errName = (err && err.name) ? `[${err.name}] ` : '';
+      const errMsg  = (err && err.message) ? err.message : 'Make sure you are using a secure connection (HTTPS) and have a working camera.';
+      showError('📷 Camera Error', errName + errMsg);
     }
     return;
   }
@@ -274,8 +276,24 @@ async function initAR() {
   });
 }
 
-// Start immediately (since it's an ES module, it runs after parsing)
-initAR().catch(err => {
-  showError('⚠️ Initialization Error', (err && err.message) ? err.message : 'An unknown error occurred.');
-  console.error('[BurgerAR] Init Error:', err);
-});
+// Wait for user gesture to start AR (Fixes mobile browser permission blocks)
+const startOverlay = document.getElementById('start-overlay');
+const startBtn = document.getElementById('start-ar-btn');
+
+if (startBtn && startOverlay) {
+  startBtn.addEventListener('click', () => {
+    // Hide overlay
+    startOverlay.style.display = 'none';
+    
+    // Start AR Engine
+    initAR().catch(err => {
+      showError('⚠️ Initialization Error', (err && err.message) ? err.message : 'An unknown error occurred.');
+      console.error('[BurgerAR] Init Error:', err);
+    });
+  });
+} else {
+  // Fallback if overlay is missing
+  initAR().catch(err => {
+    console.error('[BurgerAR] Init Error:', err);
+  });
+}
