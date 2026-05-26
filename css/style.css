@@ -1,0 +1,197 @@
+/* ============================================
+   GLOBAL STYLES — BurgerAR WebAR Experience
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ── Design Tokens ── */
+:root {
+  /* Colors */
+  --color-bg:          #080810;
+  --color-bg-2:        #0d0d1a;
+  --color-surface:     rgba(255,255,255,0.04);
+  --color-surface-2:   rgba(255,255,255,0.08);
+  --color-border:      rgba(255,255,255,0.08);
+  --color-border-glow: rgba(255,107,53,0.35);
+
+  --color-primary:     #ff6b35;
+  --color-primary-dim: rgba(255,107,53,0.15);
+  --color-gold:        #ffd700;
+  --color-gold-dim:    rgba(255,215,0,0.12);
+  --color-accent:      #ff9f1c;
+
+  --color-text-1:      #ffffff;
+  --color-text-2:      rgba(255,255,255,0.70);
+  --color-text-3:      rgba(255,255,255,0.40);
+
+  /* Gradients */
+  --gradient-primary:  linear-gradient(135deg, #ff6b35, #ffd700);
+  --gradient-glow:     radial-gradient(ellipse at center, rgba(255,107,53,0.3) 0%, transparent 70%);
+  --gradient-card:     linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+
+  /* Shadows */
+  --shadow-primary:    0 0 40px rgba(255,107,53,0.3);
+  --shadow-gold:       0 0 40px rgba(255,215,0,0.2);
+  --shadow-card:       0 8px 32px rgba(0,0,0,0.4);
+  --shadow-btn:        0 4px 24px rgba(255,107,53,0.45);
+
+  /* Typography */
+  --font-main:  'Outfit', system-ui, sans-serif;
+
+  /* Spacing */
+  --radius-sm:  8px;
+  --radius-md:  16px;
+  --radius-lg:  24px;
+  --radius-xl:  32px;
+  --radius-full: 999px;
+
+  /* Transitions */
+  --transition-fast:   150ms ease;
+  --transition-base:   250ms ease;
+  --transition-slow:   400ms ease;
+}
+
+/* ── Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--color-bg);
+  color: var(--color-text-1);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { display: block; max-width: 100%; }
+a  { text-decoration: none; color: inherit; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+}
+
+/* ── Background Orbs ── */
+.bg-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+.orb-1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(255,107,53,0.25) 0%, transparent 70%);
+  top: -200px; right: -150px;
+  animation: orbFloat1 12s ease-in-out infinite;
+}
+.orb-2 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, transparent 70%);
+  bottom: -100px; left: -150px;
+  animation: orbFloat2 15s ease-in-out infinite;
+}
+.orb-3 {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(255,107,53,0.12) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation: orbFloat3 10s ease-in-out infinite;
+}
+
+@keyframes orbFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%       { transform: translate(-30px, 30px) scale(1.1); }
+}
+@keyframes orbFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%       { transform: translate(20px, -20px) scale(1.05); }
+}
+@keyframes orbFloat3 {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50%       { transform: translate(-50%, -55%) scale(1.2); }
+}
+
+/* ── Particle Canvas ── */
+#particles-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ── Glassmorphism Card ── */
+.glass-card {
+  background: var(--gradient-card);
+  border: 1px solid var(--color-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--radius-lg);
+}
+
+/* ── Gradient Text ── */
+.title-gradient {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Glow Pulse ── */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(255,107,53,0.3); }
+  50%       { box-shadow: 0 0 50px rgba(255,107,53,0.6), 0 0 80px rgba(255,215,0,0.2); }
+}
+@keyframes scanLine {
+  0%   { top: 0; opacity: 1; }
+  100% { top: 100%; opacity: 0.3; }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.05); opacity: 0.8; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-12px); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ── Utility ── */
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+}

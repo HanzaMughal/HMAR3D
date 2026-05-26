@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Get the QR Code for BurgerAR — scan it with your phone to launch the AR experience instantly." />
+  <title>BurgerAR — Get QR Code</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- QR Code library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./css/style.css" />
+
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    /* ── Navbar ── */
+    .qr-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: linear-gradient(180deg, rgba(8,8,16,0.95) 0%, transparent 100%);
+      backdrop-filter: blur(10px);
+      z-index: 10;
+    }
+    .qr-nav a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--color-text-2);
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      transition: all var(--transition-base);
+    }
+    .qr-nav a:hover {
+      color: var(--color-primary);
+      border-color: var(--color-primary);
+      background: var(--color-primary-dim);
+    }
+    .qr-nav-logo {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-left: auto;
+    }
+    .qr-nav-logo span { color: var(--color-primary); }
+
+    /* ── Page ── */
+    .qr-page {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      max-width: 520px;
+      width: 100%;
+      margin-top: 80px;
+      animation: fadeInUp 0.7s ease both;
+    }
+
+    .qr-title {
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: -1px;
+      text-align: center;
+    }
+    .qr-subtitle {
+      font-size: 0.95rem;
+      color: var(--color-text-2);
+      text-align: center;
+      margin-top: -20px;
+      line-height: 1.6;
+    }
+
+    /* ── URL Input ── */
+    .url-input-group {
+      display: flex;
+      width: 100%;
+      gap: 10px;
+    }
+    .url-input {
+      flex: 1;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      color: var(--color-text-1);
+      font-family: var(--font-main);
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color var(--transition-base);
+    }
+    .url-input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-dim);
+    }
+    .url-input::placeholder { color: var(--color-text-3); }
+
+    .generate-btn {
+      padding: 14px 22px;
+      border-radius: var(--radius-md);
+      background: var(--gradient-primary);
+      color: #fff;
+      font-family: var(--font-main);
+      font-size: 0.875rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all var(--transition-base);
+      white-space: nowrap;
+    }
+    .generate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-btn);
+    }
+
+    /* ── QR Card ── */
+    .qr-card {
+      width: 100%;
+      padding: 32px;
+      border-radius: var(--radius-xl);
+      background: var(--gradient-card);
+      border: 1px solid var(--color-border);
+      backdrop-filter: blur(20px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .qr-canvas-wrapper {
+      position: relative;
+      background: #fff;
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 8px 40px rgba(255,107,53,0.2);
+    }
+    #qr-canvas {
+      display: block;
+      border-radius: 8px;
+    }
+    .qr-logo-overlay {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 48px; height: 48px;
+      background: #fff;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .qr-url-display {
+      font-size: 0.78rem;
+      color: var(--color-text-3);
+      word-break: break-all;
+      text-align: center;
+      max-width: 280px;
+    }
+
+    /* ── Action Buttons ── */
+    .qr-actions {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+    }
+    .qr-action-btn {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      color: var(--color-text-2);
+      font-family: var(--font-main);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all var(--transition-base);
+    }
+    .qr-action-btn:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      background: var(--color-primary-dim);
+      transform: translateY(-2px);
+    }
+    .qr-action-btn.primary {
+      background: var(--gradient-primary);
+      border-color: transparent;
+      color: #fff;
+    }
+    .qr-action-btn.primary:hover {
+      color: #fff;
+      box-shadow: var(--shadow-btn);
+    }
+
+    /* ── Instructions ── */
+    .qr-instructions {
+      width: 100%;
+      padding: 20px 24px;
+      border-radius: var(--radius-lg);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+    }
+    .qr-instructions h3 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .qr-instructions ol {
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .qr-instructions li {
+      font-size: 0.85rem;
+      color: var(--color-text-2);
+      line-height: 1.5;
+    }
+
+    /* ── Placeholder ── */
+    .qr-placeholder {
+      width: 220px; height: 220px;
+      border-radius: var(--radius-lg);
+      background: var(--color-surface);
+      border: 2px dashed var(--color-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--color-text-3);
+    }
+    .qr-placeholder-icon { font-size: 2.5rem; }
+    .qr-placeholder-text { font-size: 0.8rem; text-align: center; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 32px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      padding: 12px 24px;
+      border-radius: var(--radius-full);
+      background: rgba(0,200,100,0.15);
+      border: 1px solid rgba(0,200,100,0.4);
+      color: #00ff88;
+      font-size: 0.875rem;
+      font-weight: 700;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 1000;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 480px) {
+      .qr-nav { padding: 16px 20px; }
+      .url-input-group { flex-direction: column; }
+      .qr-actions { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background -->
+  <div class="bg-orb orb-1" aria-hidden="true"></div>
+  <div class="bg-orb orb-2" aria-hidden="true"></div>
+
+  <!-- Nav -->
+  <nav class="qr-nav">
+    <a href="./index.html" aria-label="Back to home">← Home</a>
+    <a href="./ar.html" aria-label="Launch AR">📷 Launch AR</a>
+    <div class="qr-nav-logo">Burger<span>AR</span></div>
+  </nav>
+
+  <!-- Page Content -->
+  <main class="qr-page" role="main">
+
+    <h1 class="qr-title">📲 Get Your <span class="title-gradient">QR Code</span></h1>
+    <p class="qr-subtitle">
+      Enter your hosted website URL to generate a QR code.<br>
+      Print it on menus, posters, or packaging!
+    </p>
+
+    <!-- URL Input -->
+    <div class="url-input-group">
+      <input
+        type="url"
+        id="site-url"
+        class="url-input"
+        placeholder="https://your-site.vercel.app/ar.html"
+        value=""
+        aria-label="Enter your deployed website URL"
+      />
+      <button class="generate-btn" id="generate-btn" onclick="generateQR()">
+        Generate
+      </button>
+    </div>
+
+    <!-- QR Card -->
+    <div class="qr-card glass-card">
+      <div class="qr-canvas-wrapper" id="qr-wrapper">
+        <!-- Placeholder until generated -->
+        <div class="qr-placeholder" id="qr-placeholder">
+          <div class="qr-placeholder-icon">🔲</div>
+          <div class="qr-placeholder-text">Enter your URL above<br>and click Generate</div>
+        </div>
+        <canvas id="qr-canvas" style="display:none;"></canvas>
+        <div class="qr-logo-overlay" id="qr-logo" style="display:none;">🍔</div>
+      </div>
+
+      <p class="qr-url-display" id="qr-url-display">Your QR code will appear here</p>
+
+      <!-- Action Buttons -->
+      <div class="qr-actions">
+        <button class="qr-action-btn" id="copy-btn" onclick="copyURL()" disabled>
+          📋 Copy URL
+        </button>
+        <button class="qr-action-btn primary" id="download-btn" onclick="downloadQR()" disabled>
+          ⬇️ Download QR
+        </button>
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="qr-instructions">
+      <h3>📋 How to deploy &amp; use</h3>
+      <ol>
+        <li><strong>Compile</strong> your marker image at <a href="https://hiukim.github.io/mind-ar-js-doc/tools/compile" target="_blank" style="color:var(--color-primary)">MindAR Compiler ↗</a> → save as <code>assets/targets/targets.mind</code></li>
+        <li><strong>Upload</strong> this entire project folder to <a href="https://vercel.com" target="_blank" style="color:var(--color-primary)">Vercel ↗</a> or <a href="https://netlify.com" target="_blank" style="color:var(--color-primary)">Netlify ↗</a> (free &amp; HTTPS)</li>
+        <li><strong>Copy</strong> your live URL (e.g. <code>https://burger-ar.vercel.app/ar.html</code>)</li>
+        <li><strong>Paste</strong> it above and click <em>Generate</em></li>
+        <li><strong>Download</strong> &amp; print the QR code on your menus or posters</li>
+        <li>Users scan → website opens → 3D burger appears! 🍔✨</li>
+      </ol>
+    </div>
+
+  </main>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    'use strict';
+
+    let currentURL = '';
+
+    /* ── Auto-detect current origin and pre-fill ── */
+    (function prefill() {
+      const input = document.getElementById('site-url');
+      if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        input.value = location.origin + '/ar.html';
+      }
+    })();
+
+    /* ── Generate QR ── */
+    function generateQR() {
+      const input = document.getElementById('site-url');
+      const url = input.value.trim();
+
+      if (!url) {
+        showToast('⚠️ Please enter a URL first', 'warning');
+        input.focus();
+        return;
+      }
+
+      try { new URL(url); } catch {
+        showToast('⚠️ Please enter a valid URL (include https://)', 'warning');
+        return;
+      }
+
+      currentURL = url;
+
+      const canvas    = document.getElementById('qr-canvas');
+      const placeholder = document.getElementById('qr-placeholder');
+      const logo      = document.getElementById('qr-logo');
+      const urlDisplay = document.getElementById('qr-url-display');
+
+      QRCode.toCanvas(canvas, url, {
+        width:             260,
+        margin:            2,
+        color: {
+          dark:  '#1a0500',
+          light: '#ffffff',
+        },
+        errorCorrectionLevel: 'H',   // High — allows logo overlay
+      }, (err) => {
+        if (err) {
+          showToast('❌ QR generation failed', 'error');
+          console.error(err);
+          return;
+        }
+
+        placeholder.style.display = 'none';
+        canvas.style.display      = 'block';
+        logo.style.display        = 'flex';
+        urlDisplay.textContent    = url;
+
+        document.getElementById('copy-btn').disabled     = false;
+        document.getElementById('download-btn').disabled = false;
+
+        showToast('✅ QR code generated!');
+      });
+    }
+
+    /* ── Download QR ── */
+    function downloadQR() {
+      const canvas = document.getElementById('qr-canvas');
+      if (!canvas || canvas.style.display === 'none') {
+        showToast('⚠️ Generate a QR code first', 'warning');
+        return;
+      }
+
+      // Create high-res version for print
+      const printCanvas = document.createElement('canvas');
+      const size = 800;
+      printCanvas.width  = size;
+      printCanvas.height = size;
+      const ctx = printCanvas.getContext('2d');
+
+      // White background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+
+      // Scale up QR
+      ctx.drawImage(canvas, 0, 0, size, size);
+
+      // Draw burger emoji as logo center
+      const logoSize = 120;
+      const logoX = (size - logoSize) / 2;
+      const logoY = (size - logoSize) / 2;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.roundRect(logoX - 8, logoY - 8, logoSize + 16, logoSize + 16, 16);
+      ctx.fill();
+      ctx.font = `${logoSize}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🍔', size / 2, size / 2);
+
+      const link = document.createElement('a');
+      link.download = 'BurgerAR-QRCode.png';
+      link.href = printCanvas.toDataURL('image/png');
+      link.click();
+
+      showToast('⬇️ QR Code downloaded!');
+    }
+
+    /* ── Copy URL ── */
+    function copyURL() {
+      if (!currentURL) return;
+      navigator.clipboard.writeText(currentURL).then(() => {
+        showToast('📋 URL copied to clipboard!');
+      }).catch(() => {
+        showToast('❌ Copy failed — try manually');
+      });
+    }
+
+    /* ── Enter key triggers generate ── */
+    document.getElementById('site-url').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') generateQR();
+    });
+
+    /* ── Toast ── */
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+  </script>
+
+</body>
+</html>

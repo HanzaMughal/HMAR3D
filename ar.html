@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="BurgerAR — Augmented Reality experience. Point your camera at the marker image to see the 3D burger." />
+  <meta name="theme-color" content="#000000" />
+
+  <!-- Prevent zoom on double-tap (mobile AR) -->
+  <meta name="touch-action" content="none" />
+
+  <title>BurgerAR — AR Experience</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/ar.css" />
+
+  <!-- ╔══════════════════════════════════════════════╗
+       ║  MindAR.js + Three.js — AR Libraries (CDN)  ║
+       ╚══════════════════════════════════════════════╝ -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"></script>
+</head>
+<body class="ar-page">
+
+  <!-- ░░ Loading Screen ░░ -->
+  <div id="loading-screen" role="status" aria-live="polite">
+    <div class="loading-logo">
+      <span class="loading-logo-icon" aria-hidden="true">🍔</span>
+      <span class="loading-logo-text">Burger<span class="loading-logo-accent">AR</span></span>
+    </div>
+
+    <div class="loading-spinner-wrapper" aria-hidden="true">
+      <div class="loading-spinner"></div>
+      <div class="loading-spinner-inner"></div>
+      <div class="loading-icon">📷</div>
+    </div>
+
+    <p class="loading-text" id="loading-text">Initializing AR engine…</p>
+
+    <div class="loading-progress" aria-hidden="true">
+      <div class="loading-progress-bar"></div>
+    </div>
+
+    <p class="loading-subtext">
+      Point your camera at the burger image<br>when it's ready ✨
+    </p>
+  </div>
+
+  <!-- ░░ Error Screen ░░ -->
+  <div id="error-screen" role="alert" aria-live="assertive">
+    <div class="error-icon">⚠️</div>
+    <h2 class="error-title">AR Unavailable</h2>
+    <p class="error-msg" id="error-msg">Something went wrong. Please try again.</p>
+
+    <!-- Special instructions for missing .mind file -->
+    <div class="error-steps" id="mind-file-steps" style="display:none">
+      <p>📋 To set up the AR target file:</p>
+      <ol>
+        <li>Go to <a href="https://hiukim.github.io/mind-ar-js-doc/tools/compile" target="_blank" rel="noopener">MindAR Compiler ↗</a></li>
+        <li>Upload your <strong>marker image</strong> (images (1).jpg)</li>
+        <li>Click <strong>Start</strong> and wait for compilation</li>
+        <li>Download the <strong>targets.mind</strong> file</li>
+        <li>Place it in <code>assets/targets/targets.mind</code></li>
+        <li>Deploy &amp; reload this page</li>
+      </ol>
+    </div>
+
+    <a href="./index.html" class="error-back-btn">← Back to Home</a>
+  </div>
+
+  <!-- ░░ AR Container (camera + canvas rendered here by MindAR) ░░ -->
+  <div id="ar-container" aria-label="Augmented Reality camera view"></div>
+
+  <!-- ░░ AR UI Overlay ░░ -->
+  <div id="ar-ui" aria-label="AR controls">
+
+    <!-- Back button -->
+    <button class="ar-back-btn" id="ar-back-btn" onclick="window.location.href='./index.html'" aria-label="Go back to home page">
+      <span aria-hidden="true">←</span>
+      <span>Back</span>
+    </button>
+
+    <!-- Live AR badge -->
+    <div class="ar-badge" aria-label="AR is active">
+      <div class="ar-badge-dot" aria-hidden="true"></div>
+      <span class="ar-badge-text">Live AR</span>
+    </div>
+
+    <!-- Target found indicator -->
+    <div id="target-indicator" role="status" aria-live="polite">
+      ✅ Target Detected
+    </div>
+
+    <!-- Instructions overlay -->
+    <div id="instructions-overlay" aria-label="Scanning instructions">
+      <div class="instruction-card">
+        <span class="instruction-icon" aria-hidden="true">📱</span>
+        <span class="instruction-text">Point camera at the burger image</span>
+      </div>
+      <div class="instruction-dots" aria-hidden="true">
+        <div class="instruction-dot active"></div>
+        <div class="instruction-dot"></div>
+        <div class="instruction-dot"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ░░ AR Controller ░░ -->
+  <script src="./js/ar-controller.js"></script>
+
+  <!-- ░░ Show mind-file steps if error is missing target ░░ -->
+  <script>
+    // Expose helper for ar-controller to toggle the mind-file instructions
+    window.__showMindFileSteps = function () {
+      const el = document.getElementById('mind-file-steps');
+      if (el) el.style.display = 'block';
+    };
+
+    // Animate instruction dots
+    (function animateDots() {
+      const dots = document.querySelectorAll('.instruction-dot');
+      if (!dots.length) return;
+      let current = 0;
+      setInterval(() => {
+        dots.forEach(d => d.classList.remove('active'));
+        current = (current + 1) % dots.length;
+        dots[current].classList.add('active');
+      }, 900);
+    })();
+
+    // Prevent pull-to-refresh on mobile during AR
+    document.body.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 1) e.preventDefault();
+    }, { passive: false });
+  </script>
+
+</body>
+</html>

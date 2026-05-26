@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Experience our burger menu in 3D! Scan the marker image with your phone camera and watch a 3D model appear in Augmented Reality — no app needed." />
+  <meta name="theme-color" content="#080810" />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="BurgerAR — Experience in 3D" />
+  <meta property="og:description" content="Point your camera at the image and see a 3D burger appear in AR!" />
+  <meta property="og:type"        content="website" />
+
+  <title>BurgerAR — Experience in 3D</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/landing.css" />
+</head>
+<body>
+
+  <!-- ░░ Background Effects ░░ -->
+  <canvas id="particles-canvas" aria-hidden="true"></canvas>
+  <div class="bg-orb orb-1" aria-hidden="true"></div>
+  <div class="bg-orb orb-2" aria-hidden="true"></div>
+  <div class="bg-orb orb-3" aria-hidden="true"></div>
+
+  <!-- ░░ Navigation ░░ -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-logo">
+      <span class="logo-icon" aria-hidden="true">🍔</span>
+      <span class="logo-text">Burger<span class="logo-accent">AR</span></span>
+    </div>
+    <a href="./qr.html" class="nav-qr-btn" id="nav-qr-link">
+      📲 Get QR Code
+    </a>
+  </nav>
+
+  <!-- ░░ Hero ░░ -->
+  <main class="hero" role="main">
+
+    <!-- Left: Content -->
+    <div class="hero-content">
+
+      <!-- Badge -->
+      <div class="hero-badge" role="note">
+        <span class="badge-dot" aria-hidden="true"></span>
+        <span>WebAR Experience — No App Required</span>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="hero-title">
+        Experience Our<br>
+        <span class="title-gradient">Burger in 3D!</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="hero-subtitle">
+        Point your phone camera at the special marker image and watch your burger
+        come alive in Augmented Reality — right in your browser, instantly.
+      </p>
+
+      <!-- Steps -->
+      <div class="steps-container" aria-label="How it works">
+        <div class="step">
+          <div class="step-number" aria-hidden="true">1</div>
+          <span class="step-text">Open the camera</span>
+        </div>
+        <span class="step-arrow" aria-hidden="true">→</span>
+        <div class="step">
+          <div class="step-number" aria-hidden="true">2</div>
+          <span class="step-text">Point at the image</span>
+        </div>
+        <span class="step-arrow" aria-hidden="true">→</span>
+        <div class="step">
+          <div class="step-number" aria-hidden="true">3</div>
+          <span class="step-text">Watch the magic! ✨</span>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-container">
+        <a href="./ar.html" id="start-ar-btn" class="cta-btn" role="button" aria-label="Start the AR camera experience">
+          <span class="cta-icon" aria-hidden="true">📷</span>
+          <span class="cta-text">Start AR Experience</span>
+          <span class="cta-arrow" aria-hidden="true">→</span>
+        </a>
+        <p class="cta-note">✅ No download needed &nbsp;·&nbsp; Works on Android &amp; iOS</p>
+      </div>
+
+    </div>
+
+    <!-- Right: Marker Card -->
+    <div class="marker-card-wrapper">
+      <div class="marker-card glass-card">
+        <div class="card-glow" aria-hidden="true"></div>
+
+        <div class="card-header">
+          <span class="card-label">📌 Scan This Image</span>
+        </div>
+
+        <div class="marker-image-container">
+          <img
+            src="./assets/images/marker-preview.jpg"
+            alt="Marker image — point your camera at this burger image to trigger the 3D AR experience"
+            class="marker-img"
+            id="marker-preview"
+          />
+          <!-- Scan animation overlay -->
+          <div class="scan-overlay" aria-hidden="true">
+            <div class="scan-corner tl"></div>
+            <div class="scan-corner tr"></div>
+            <div class="scan-corner bl"></div>
+            <div class="scan-corner br"></div>
+            <div class="scan-line"></div>
+          </div>
+        </div>
+
+        <p class="card-caption">👆 Point your camera at this image to begin the experience</p>
+      </div>
+
+      <!-- 3D badge -->
+      <div class="floating-badge" aria-hidden="true">3D</div>
+    </div>
+
+  </main>
+
+  <!-- ░░ Features ░░ -->
+  <section class="features" aria-label="Key features">
+    <div class="feature-item">
+      <div class="feature-icon" aria-hidden="true">🚀</div>
+      <h3>Instant Launch</h3>
+      <p>No app download required. Opens directly in your mobile browser.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon" aria-hidden="true">📱</div>
+      <h3>Mobile Ready</h3>
+      <p>Fully optimized for iOS Safari and Android Chrome.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon" aria-hidden="true">✨</div>
+      <h3>Real-Time AR</h3>
+      <p>3D model tracks your camera movement live in real-time.</p>
+    </div>
+  </section>
+
+  <!-- ░░ Scripts ░░ -->
+  <script src="./js/ui.js"></script>
+  <script src="./js/app.js"></script>
+
+</body>
+</html>
