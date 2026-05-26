@@ -286,15 +286,16 @@
        This uses MindAR + A-Frame — the most reliable
        approach for WebAR on mobile browsers.
        ══════════════════════════════════════════════ -->
-  <a-scene
-    id="ar-scene"
-    style="display:none"
-    mindar-image="imageTargetSrc: ./assets/targets/targets.mind; autoStart: false; uiLoading: no; uiScanning: no; uiError: no;"
-    color-space="sRGB"
-    renderer="colorManagement: true; physicallyCorrectLights: true;"
-    vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: false"
-  >
+  <div id="ar-container">
+    <a-scene
+      id="ar-scene"
+      style="display:none"
+      mindar-image="imageTargetSrc: ./assets/targets/targets.mind; autoStart: false; uiLoading: no; uiScanning: no; uiError: no;"
+      color-space="sRGB"
+      renderer="colorManagement: true; physicallyCorrectLights: true;"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+    >
     <!-- Assets (preloaded) -->
     <a-assets timeout="30000">
       <a-asset-item id="burger-model" src="./assets/models/burger.glb"></a-asset-item>
@@ -339,6 +340,7 @@
     <a-light type="point" color="#ffd700" intensity="0.8" distance="5" position="0 2 -1"></a-light>
 
   </a-scene>
+</div>
 
   <!-- ══════════════════════════════════════════════
        AR UI OVERLAY (back button, live badge, tips)
@@ -373,13 +375,12 @@
     }
 
 async function startAR() {
-  if (sceneStarted) return;
-
-  // Show AR scene UI
-  sceneStarted = true;
-  document.getElementById('start-screen').style.display = 'none';
-  document.getElementById('ar-scene').style.display = 'block';
-  document.getElementById('ar-ui').classList.add('visible');
+    // Show AR container and scene UI
+    document.getElementById('ar-container').style.display = 'block';
+    sceneStarted = true;
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('ar-scene').style.display = 'block';
+    document.getElementById('ar-ui').classList.add('visible');
 
   // Start MindAR tracking (which will request camera permission via user gesture)
   const scene = document.getElementById('ar-scene');
