@@ -372,68 +372,43 @@
       document.getElementById('ar-scene').style.display     = 'none';
     }
 
-    async function startAR() {
-      if (sceneStarted) return;
+async function startAR() {
+  if (sceneStarted) return;
 
-      // First: request raw camera access to trigger the browser permission popup
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        // Permission granted — stop the raw stream, MindAR will open its own
-        stream.getTracks().forEach(t => t.stop());
-      } catch (err) {
-        if (err.name === 'NotAllowedError') {
-          showError(
-            '📷 Camera Blocked',
-            'You denied camera access. Please go to your browser Site Settings, find this site, and set Camera to "Allow". Then reload.'
-          );
-        } else if (err.name === 'NotFoundError') {
-          showError(
-            '📷 No Camera Found',
-            'Your device does not have a camera or it is not accessible. Try a different device.'
-          );
-        } else {
-          showError(
-            '📷 Camera Error [' + err.name + ']',
-            err.message || 'Could not access the camera. Make sure you are on HTTPS and using Chrome or Safari.'
-          );
-        }
-        return;
-      }
+  // Show AR scene UI
+  sceneStarted = true;
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('ar-scene').style.display = 'block';
+  document.getElementById('ar-ui').classList.add('visible');
 
-      // Camera access confirmed — show the scene
-      sceneStarted = true;
-      document.getElementById('start-screen').style.display = 'none';
-      document.getElementById('ar-scene').style.display     = 'block';
-      document.getElementById('ar-ui').classList.add('visible');
-
-      // Start MindAR tracking
-      const scene    = document.getElementById('ar-scene');
-      const arSystem = scene.systems['mindar-image-system'];
-      if (arSystem) {
-        try {
-          await arSystem.start();
-        } catch (err) {
-          showError('⚙️ AR Engine Error', (err && err.message) ? err.message : 'Failed to start AR tracking.');
-          return;
-        }
-      }
-
-      // Listen for target found / lost events
-      const target = document.getElementById('ar-target');
-      if (target) {
-        target.addEventListener('targetFound', () => {
-          const toast = document.getElementById('target-toast');
-          const tip   = document.getElementById('scan-tip');
-          if (toast) toast.classList.add('visible');
-          if (tip)   tip.classList.add('hidden');
-          setTimeout(() => { if (toast) toast.classList.remove('visible'); }, 2000);
-        });
-        target.addEventListener('targetLost', () => {
-          const tip = document.getElementById('scan-tip');
-          if (tip) tip.classList.remove('hidden');
-        });
-      }
+  // Start MindAR tracking (which will request camera permission via user gesture)
+  const scene = document.getElementById('ar-scene');
+  const arSystem = scene.systems['mindar-image-system'];
+  if (arSystem) {
+    try {
+      await arSystem.start();
+    } catch (err) {
+      showError('⚙️ AR Engine Error', (err && err.message) ? err.message : 'Failed to start AR tracking.');
+      return;
     }
+  }
+
+  // Listen for target found / lost events
+  const target = document.getElementById('ar-target');
+  if (target) {
+    target.addEventListener('targetFound', () => {
+      const toast = document.getElementById('target-toast');
+      const tip = document.getElementById('scan-tip');
+      if (toast) toast.classList.add('visible');
+      if (tip) tip.classList.add('hidden');
+      setTimeout(() => { if (toast) toast.classList.remove('visible'); }, 2000);
+    });
+    target.addEventListener('targetLost', () => {
+      const tip = document.getElementById('scan-tip');
+      if (tip) tip.classList.remove('hidden');
+    });
+  }
+}
 
     function stopAR() {
       const scene    = document.getElementById('ar-scene');
