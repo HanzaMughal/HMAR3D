@@ -231,13 +231,13 @@ async function initAR() {
   try {
     await mindarThree.start();
   } catch (err) {
-    if (err.name === 'NotAllowedError' || err.message?.includes('Permission')) {
+    if (err && (err.name === 'NotAllowedError' || (err.message && err.message.includes('Permission')))) {
       showError(
         '📷 Camera Permission Denied',
         'Please allow camera access when prompted, then reload the page. On iOS: Settings → Safari → Camera → Allow.'
       );
     } else {
-      showError('📷 Camera Error', err.message || 'Could not access the camera.');
+      showError('📷 Camera Error', (err && err.message) ? err.message : 'Could not access the camera. Make sure you are using a secure connection (HTTPS) and have a working camera.');
     }
     return;
   }
@@ -276,5 +276,6 @@ async function initAR() {
 
 // Start immediately (since it's an ES module, it runs after parsing)
 initAR().catch(err => {
-  showError('⚠️ Initialization Error', err.message);
+  showError('⚠️ Initialization Error', (err && err.message) ? err.message : 'An unknown error occurred.');
+  console.error('[BurgerAR] Init Error:', err);
 });
