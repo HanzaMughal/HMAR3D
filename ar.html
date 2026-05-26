@@ -21,34 +21,17 @@
   <link rel="stylesheet" href="./css/ar.css" />
 
   <!-- ╔══════════════════════════════════════════════════════╗
-       ║  AR Libraries — Three.js r128 + GLTFLoader + MindAR ║
+       ║  AR Libraries — ES Modules via Import Map            ║
        ╚══════════════════════════════════════════════════════╝ -->
-
-  <!-- Step 1: Track load state -->
-  <script>
-    window.__AR_LIBS = { three: false, gltf: false, mindar: false, errors: [] };
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/",
+        "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+      }
+    }
   </script>
-
-  <!-- Step 2: Three.js r128 (must match MindAR's bundled version) -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"
-    onload="window.__AR_LIBS.three = true;"
-    onerror="window.__AR_LIBS.errors.push('three');"
-  ></script>
-
-  <!-- Step 3: GLTFLoader (for loading .glb 3D models) -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"
-    onload="window.__AR_LIBS.gltf = true;"
-    onerror="window.__AR_LIBS.errors.push('gltf');"
-  ></script>
-
-  <!-- Step 4: MindAR image tracking (uses external THREE loaded above) -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
-    onload="window.__AR_LIBS.mindar = true;"
-    onerror="window.__AR_LIBS.errors.push('mindar');"
-  ></script>
 </head>
 <body class="ar-page">
 
@@ -65,7 +48,7 @@
       <div class="loading-icon">📷</div>
     </div>
 
-    <p class="loading-text" id="loading-text">Initializing AR engine…</p>
+    <p class="loading-text" id="loading-text">Loading AR modules…</p>
 
     <div class="loading-progress" aria-hidden="true">
       <div class="loading-progress-bar"></div>
@@ -137,9 +120,6 @@
 
   </div>
 
-  <!-- ░░ AR Controller ░░ -->
-  <script src="./js/ar-controller.js"></script>
-
   <!-- ░░ Show mind-file steps if error is missing target ░░ -->
   <script>
     // Expose helper for ar-controller to toggle the mind-file instructions
@@ -165,6 +145,9 @@
       if (e.touches.length === 1) e.preventDefault();
     }, { passive: false });
   </script>
+
+  <!-- ░░ AR Controller (Loaded as ES Module) ░░ -->
+  <script type="module" src="./js/ar-controller.js"></script>
 
 </body>
 </html>
